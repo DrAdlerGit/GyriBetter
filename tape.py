@@ -10,34 +10,67 @@ class Tape:
         self.x: int = 0
         self.y: int = 0
     
-    def up(self, count):
+    def up(self, count: int):
         """
-        Move the cursor up (Y+) in the 2D tape.
+        Move the cursor up (Y+) in the 2D tape <count> times.
         """
         self.y += count
 
-        return self.cells.setdefault((self.x, self.y), 0)
+        self.cells.setdefault((self.x, self.y), 0)
     
-    def left(self, count):
+    def left(self, count: int):
         """
-        Move the cursor left (X-) in the 2D tape.
+        Move the cursor left (X-) in the 2D tape <count> times.
         """
         self.x -= count
 
-        return self.cells.setdefault((self.x, self.y), 0)
+        self.cells.setdefault((self.x, self.y), 0)
     
-    def down(self, count):
+    def down(self, count: int):
         """
-        Move the cursor down (Y-) in the 2D tape.
+        Move the cursor down (Y-) in the 2D tape <count> times.
         """
         self.y -= count
 
-        return self.cells.setdefault((self.x, self.y), 0)
+        self.cells.setdefault((self.x, self.y), 0)
     
-    def right(self, count):
+    def right(self, count: int):
         """
-        Move the cursor right (X+) in the 2D tape.
+        Move the cursor right (X+) in the 2D tape <count> times.
         """
         self.x += count
 
-        return self.cells.setdefault((self.x, self.y), 0)
+        self.cells.setdefault((self.x, self.y), 0)
+    
+    def get(self, coordinates: tuple):
+        """
+        Get the value of the cell <coordinates>
+        """
+        self.cells.setdefault((self.x, self.y), 0)
+        return self.cells[coordinates]
+    
+    def set(self, x: int, y: int, value: int):
+        """
+        Set the value at (<x>, <y>) to <value>
+        """
+        self.cells[(x, y)] = value
+
+    def current(self):
+        """
+        Returns the current x and y positions
+        """
+        return (self.x, self.y)
+    
+    def inc(self, coordinates: tuple, count: int):
+        """
+        Increments the value at <coordinates> by <count>
+        """
+        self.cells.setdefault((self.x, self.y), 0)
+        self.cells[coordinates] += count
+    
+    def dec(self, coordinates: tuple, count: int):
+        """
+        Decrements the value at <coordinates> by <count>
+        """
+        self.cells.setdefault((self.x, self.y), 0)
+        self.cells[coordinates] -= count
