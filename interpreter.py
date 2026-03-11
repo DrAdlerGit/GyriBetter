@@ -10,7 +10,7 @@ def parseNumber(string, index):
     j = index
     while j < len(string) and string[j] in "0123456789":
         j += 1
-    return int(string[i:j]), j
+    return int(string[index:j]), j
 
 def run(code):
     TAPE = Tape()
@@ -20,6 +20,9 @@ def run(code):
         c = code[i]
 
         match c.lower():
+
+            # Basic movement
+            # ======================================================================
             case "w":
                 count, n = parseNumber(code, i)
                 
@@ -43,3 +46,26 @@ def run(code):
                 
                 TAPE.right(count)
                 i = n
+            # ======================================================================
+
+            # Flight
+            # ======================================================================
+            case "@":
+                x, n = parseNumber(code, i)
+
+                i = n + 1 # Skip over the comma
+
+                y, n = parseNumber(code, i)
+
+                i = n
+
+                if TAPE.x > x:
+                    TAPE.left(TAPE.x - x)
+                elif TAPE.x < x:
+                    TAPE.right(x - TAPE.x)
+                
+                if TAPE.y > y:
+                    TAPE.down(TAPE.y - y)
+                elif TAPE.y < y:
+                    TAPE.up(y - TAPE.y)
+            # ======================================================================

@@ -46,7 +46,7 @@ class Tape:
         """
         Get the value of the cell <coordinates>
         """
-        self.cells.setdefault((self.x, self.y), 0)
+        self.cells.setdefault(coordinates, 0)
         return self.cells[coordinates]
     
     def set(self, x: int, y: int, value: int):
@@ -65,12 +65,12 @@ class Tape:
         """
         Increments the value at <coordinates> by <count>
         """
-        self.cells.setdefault((self.x, self.y), 0)
+        self.cells.setdefault(coordinates, 0)
         self.cells[coordinates] += count
     
     def dec(self, coordinates: tuple, count: int):
         """
         Decrements the value at <coordinates> by <count>
         """
-        self.cells.setdefault((self.x, self.y), 0)
+        self.cells.setdefault(coordinates, 0)
         self.cells[coordinates] -= count
