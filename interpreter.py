@@ -3,7 +3,7 @@ from tape import Tape
 def _throw(error: str, index: int):
     raise Exception("GYRI: An error has occurred at character {index} - {error}.")
 
-def _parseNumber(string, index):
+def _parseNumber(string: str, index: int):
     """
     Read an optional integer starting at <string>[<index>].
     Returns (integer, newIndex)
@@ -11,30 +11,84 @@ def _parseNumber(string, index):
     if index >= len(string) or string[index] not in "0123456789":
         return 1, index
     j = index
+
     while j < len(string) and string[j] in "0123456789":
         j += 1
     return int(string[index:j]), j
 
-def _getArguments(string, index):
-    """
-    Reads an optional list of arguements for an instruction, starting at <string>[<index>].
-    The arguements should be in parenthesis and seperated by commas.
-    Returns (arguements[], newIndex)
-    """
-    if string[index] != "(":
-        return ([], index)
-    j = index
-    inside = True
-    while j < len(string) and inside:
-        if string[j] == ")":
-            inside = False
-
-def _parseCoordinate(string, index):
+def _parseCoordinate(string: str, index: int):
     """
     Reads a coordinate (e.g. @70, 5) starting at <string>[<index>].
     Returns ((x, y), newIndex)
     """
-    if index !=
+    if index != "@":
+        _throw(f"Expected '@', got {string[index]}", index)
+    j = index + 1
+    x = _parseNumber(string, j)
+    
+    j += 1
+    if string[j] != ",":
+        _throw(f"Expected ',', got {string[j]}", j)
+    y = _parseNumber(string, j)
+
+    j += 1
+    return (x, y), j
+
+def _parseName(string: str, index: int, stopper: str):
+    """
+    Reads <string>[<index>] up until the first <stopper>.
+    <stopper> must be one character.
+    Returns (name, newIndex)
+    """
+    export = ""
+    
+    while string[index] != stopper:
+        export += string[index]
+        index += 1
+    return export, index
+
+def _getArguments(string: str, index: int, expect: list[list[str]]):
+    """
+    Reads an optional list of arguements for an instruction, starting at <string>[<index>].
+    The arguements should be in parenthesis and seperated by commas.
+    Returns (arguements[], newIndex), or (None, newIndex) if no arguements are found.
+
+    <expect> defines the expected arguements. Each item in <expect> is an arguement and are lists themselves.
+    Each item in <expect>[ARGUEMENT] is a string and is a type that is allowed in that arguement. Types supported in this function:
+    "int": integer
+    "coord": coordinate on 2D tape.
+    "range": range of coordiantes on 2D tape.
+    """
+    export = []
+    argType = []
+
+    if string[index] != "(":
+        return None, index
+    j = index + 1
+
+    argNum = 1
+    inside = True
+    while j < len(string) and inside:
+        if string[j] == ")":
+            inside = False
+        
+        if string[j] in "0123456789":
+            argType = ["int"]
+        elif string[j] == "@":
+            argType = ["coord", "range"]
+        else:
+            _throw("Unknown arguement type: expected coordinate, alias, range or integer", j)
+        
+        if not any(item in expect[argNum] for item in argType):
+            match argType:
+                case ["int"]:
+                    argTypeDisplay = "int"
+                case ["coord", "range"]:
+                    argTypeDisplay = "coordinate or range"
+                case _:
+                    argTypeDisplay = "unknown type"
+            _throw(f"Wrong argument, expected {expect[argNum]}, got {argTypeDisplay}", j)
+        
 
 def run(code):
     TAPE = Tape()

@@ -1,4 +1,4 @@
-from interpreter import _parseNumber
+from interpreter import _parseCoordinate
 
 class Tape:
     def __init__(self):
@@ -90,4 +90,4 @@ class Tape:
         """
         if self.aliases[string][0] == "@":
             return string
-        return _parseNumber()
+        return _parseCoordinate(string, 0)
