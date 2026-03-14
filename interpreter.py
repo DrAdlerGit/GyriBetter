@@ -111,6 +111,8 @@ def _getArguments(string: str, index: int, expect: list[list[str]]):
             j += 1
         else:
             _throw("Expected ',' or ')' after argument", j)
+    
+    return export, j
 
         
 
