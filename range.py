@@ -11,14 +11,36 @@ class Range:
         self.head = head
         self.tail = tail
 
+        self.direction = ""
+        self.twoDimensional: bool
+
         if self.head == self.tail:
             _throw("Error creating range: head coordinate cannot be the same as tail", interpreterIndex) 
         
         if head[0] == tail[0] and head[1] != tail[1]:
-            twoDimensional = False
+            self.twoDimensional = False
 
             if head[1] > tail[1]:
-                direction = "down"
+                self.direction = "down"
             else:
-                direction = "up"
+                self.direction = "up"
+        
+        elif head[0] != tail[0] and head[1] == tail[1]:
+            self.twoDimensional = False
+
+            if head[0] > tail[0]:
+                self.direction = "left"
+            else:
+                self.direction = "right"
+        
+        else:
+            self.twoDimensional = True
+
+            if head[1] > tail[1]:
+                self.direction = "down"
+            else:
+                self.direction = "up"
+        
+        self.values = []
+
                 
