@@ -13,6 +13,8 @@ class Range:
 
         self.direction = ""
         self.twoDimensional: bool
+        self.rows = 0
+        self.columns = 0
 
         if self.head == self.tail:
             _throw("Error creating range: head coordinate cannot be the same as tail", interpreterIndex) 
@@ -22,25 +24,41 @@ class Range:
 
             if head[1] > tail[1]:
                 self.direction = "down"
+                self.rows = head[1] - tail[1]
+                self.columns = 1
             else:
                 self.direction = "up"
+                self.rows = tail[1] - head[1]
+                self.columns = 1
         
         elif head[0] != tail[0] and head[1] == tail[1]:
             self.twoDimensional = False
 
             if head[0] > tail[0]:
                 self.direction = "left"
+                self.rows = head[0] - tail[0]
+                self.columns = 1
             else:
                 self.direction = "right"
+                self.rows = tail[0] - head[0]
+                self.columns = 1
         
         else:
             self.twoDimensional = True
 
             if head[1] > tail[1]:
                 self.direction = "down"
+                self.rows = tail[1] - head[1]
+                self.columns = tail[0] - head[0]
             else:
                 self.direction = "up"
+                self.rows = tail[1] - head[1]
+                self.columns = head[0] - tail[0]
         
         self.values = []
 
-                
+        # I will do 2D later
+        for row in self.rows:
+            self.values.append(tape.get(row))
+            
+        
