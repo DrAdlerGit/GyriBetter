@@ -1,4 +1,7 @@
 from tape import Tape
+TAPE = Tape()
+
+from range import Range
 
 def _throw(error: str, index: int):
     raise Exception("GYRI: An error has occurred at character {index} - {error}.")
@@ -8,31 +11,41 @@ def _parseNumber(string: str, index: int):
     Read an optional integer starting at <string>[<index>].
     Returns (integer, newIndex)
     """
-    if index >= len(string) or string[index] not in "0123456789":
+    set = "0123456789-"
+    if index >= len(string) or string[index] not in set:
         return 1, index
     j = index
-
-    while j < len(string) and string[j] in "0123456789":
+    while j < len(string) and string[j] in set:
         j += 1
+        set = set[0:10]
     return int(string[index:j]), j
 
-def _parseCoordinate(string: str, index: int):
+def _parseCoordinate(string: str, index: int, __inside__ =  False):
     """
-    Reads a coordinate (e.g. @70, 5) starting at <string>[<index>].
-    Returns ((x, y), newIndex)
+    Reads a coordinate (e.g. @70, 5) starting at <string>[<index>] or a range if the next character is a :
+    Returns ((x, y), newIndex, isRange=False) for a coordinate.
+    Returns (list[(x, y)], newIndex, isRange=True) for a range.
     """
     if index != "@":
-        _throw(f"Expected '@', got {string[index]}", index)
+        _throw(f"Error reading coordinate: expected '@', got {string[index]}", index)
     j = index + 1
     x, j = _parseNumber(string, j)
+    if x == 1:
+        _throw(f"Error reading coordinate: expected an integer as x coordinate", j)
     
     j += 1
     if string[j] != ",":
         _throw(f"Expected ',', got {string[j]}", j)
     y, j = _parseNumber(string, j)
+    if y == 1:
+        _throw(f"Error reading coordinate: expected an integer as y coordinate", j)
 
     j += 1
-    return (x, y), j
+    if string[j] == ":" and not __inside__:
+        j += 1
+        tail, k, _ = _parseCoordinate(string, j, __inside__ = True)
+        return Range((x, y), tail, TAPE, j), j, True
+    return (x, y), j, False
 
 def _parseName(string: str, index: int, stopper: str):
     """
@@ -83,7 +96,11 @@ def _getArguments(string: str, index: int, expect: list[list[str]]):
         elif string[j] == "@":
             argType = ["coord", "range"]
         else:
-            _throw("Unknown arguement type: expected coordinate, alias, range or integer", j)
+            name, j = _parseName(string, j, ",")
+            if name in TAPE.aliases:
+                pass
+            else:
+                _throw("Unknown arguement type: expected coordinate, alias, range or integer", j)
         
         if not any(item in expect[argNum] for item in argType):
             match argType:
@@ -99,7 +116,7 @@ def _getArguments(string: str, index: int, expect: list[list[str]]):
             value, j = _parseNumber(string, j)
             export.append(value)
         elif argType == ["coord", "range"]:
-            value, j = _parseCoordinate(string, j)
+            value, j, _ = _parseCoordinate(string, j)
             export.append(value)
         
         argNum += 1
@@ -117,7 +134,6 @@ def _getArguments(string: str, index: int, expect: list[list[str]]):
         
 
 def run(code):
-    TAPE = Tape()
     i = 0
 
     while i < len(code):
@@ -155,7 +171,7 @@ def run(code):
             # Flight
             # ======================================================================
             case "@":
-                combinedCoordinate, newIndex = _parseCoordinate(code, i)
+                combinedCoordinate, newIndex, _ = _parseCoordinate(code, i)
 
                 x, y = combinedCoordinate
                 i = newIndex

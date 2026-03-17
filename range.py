@@ -18,7 +18,7 @@ class Range:
         
         if head[0] == tail[0] and head[1] != tail[1]:
             if head[1] > tail[1]:
-                self.indexRanges = (head[0], range(head[1], tail[1] + 1))
+                self.indexRange = (head[0], range(head[1], tail[1] + 1))
             else:
                 self.indexRange = (head[0], range(tail[1], head[1] + 1))
         elif head[0] != tail[0] and head[1] == tail[1]:
@@ -33,6 +33,8 @@ class Range:
 
         for x, y in self.indexRange:
             self.values.append(tape.get((x, y)))
+
+        self.length = len(self.values)
 
     def getAll(self):
         """

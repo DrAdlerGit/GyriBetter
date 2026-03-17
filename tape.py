@@ -1,4 +1,5 @@
 from interpreter import _parseCoordinate
+from interpreter import _throw
 
 class Tape:
     def __init__(self):
@@ -86,8 +87,11 @@ class Tape:
     
     def resolve(self, string: str):
         """
-        Takes in a <string> that is either an alias or a coordinate and returns it as a coordinate
+        Takes in a <string> that is either an alias or a coordinate and returns it as a coordinate. Returns (0, 0) if an error occurs
         """
         if string in self.aliases:
             return self.aliases[string]
-        return _parseCoordinate(string, 0)[0]
+        elif string[0] == "@":
+            return _parseCoordinate(string, 0)[0]
+        else:
+            return (0, 0)
