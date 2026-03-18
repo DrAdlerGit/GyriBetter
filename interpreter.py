@@ -195,16 +195,23 @@ def run(code):
                     # --------------------------------------------------------------
                     case "set":
                         """
-                        Overrides the value of the current cell with
+                        Overrides the value of the current cell with <arg1: int>
                         """
-                        startPosition = i
-
                         i += 3
-                        amount = _getArguments(code, i, [["int"]])
-                        
+                        args, newIndex = _getArguments(code, i, [["int"]])
+                        i = newIndex
+
+                        amount = args[0]
+                        if amount == None:
+                            _throw("No arguement found for instruction :set", i)
+
                         TAPE.set(TAPE.x, TAPE.y, amount)
                     
                     case "inc":
-
+                        """
+                        Increment the value of the current cell by <arg1: int>
+                        """
+                        i += 3 # fuck i had an idea
+                        
                     
             # ((((((((((((((((((((((((((((((((((()))))))))))))))))))))))))))))))))))
