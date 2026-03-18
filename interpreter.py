@@ -1,7 +1,8 @@
 from tape import Tape
 TAPE = Tape()
-
 from range import Range
+
+import string
 
 def _throw(error: str, index: int):
     raise Exception("GYRI: An error has occurred at character {index} - {error}.")
@@ -131,6 +132,14 @@ def _getArguments(string: str, index: int, expect: list[list[str]]):
     
     return export, j 
 
+INSTRUCTIONS: dict = {
+    "p": {
+        "set": {
+            "args": [["int"]],
+        }
+    }
+}
+
 def run(code):
     i = 0
 
@@ -142,24 +151,32 @@ def run(code):
             # Basic movement
             # ======================================================================
             case "w":
+                if code[i+1] == ":":
+                    break
                 count, n = _parseNumber(code, i)
                 
                 TAPE.up(count)
                 i = n if n > i else i + 1
 
             case "a":
+                if code[i+1] == ":":
+                    break
                 count, n = _parseNumber(code, i)
-
+                
                 TAPE.left(count)
                 i = n if n > i else i + 1
             
             case "s":
+                if code[i+1] == ":":
+                    break
                 count, n = _parseNumber(code, i)
                 
                 TAPE.down(count)
                 i = n if n > i else i + 1
             
             case "d":
+                if code[i+1] == ":":
+                    break
                 count, n = _parseNumber(code, i)
                 
                 TAPE.right(count)
@@ -185,18 +202,16 @@ def run(code):
                     TAPE.up(y - TAPE.y)
             # ======================================================================
 
-            # ((((((((((((((((((((((((((((((((((()))))))))))))))))))))))))))))))))))
-            case ":":
-                instruction = code[i+1:i+3]
+        # ((((((((((((((((((((((((((((((((((((()))))))))))))))))))))))))))))))))))))
+        if c in string.ascii_lowercase and code[i+1] == ":":
+            instruction = code[i+2:i+4]
+            i += 2
 
+            if c == "p":
                 match instruction:
-                    
-                    # Basic modification of integers
-                    # --------------------------------------------------------------
                     case "set":
-                        """
-                        Overrides the value of the current cell with <arg1: int>
-                        """
+                        # Arguments:
+                        # 1 : int : amount to set to
                         i += 3
                         args, newIndex = _getArguments(code, i, [["int"]])
                         i = newIndex
@@ -208,10 +223,19 @@ def run(code):
                         TAPE.set(TAPE.x, TAPE.y, amount)
                     
                     case "inc":
-                        """
-                        Increment the value of the current cell by <arg1: int>
-                        """
-                        i += 3 # fuck i had an idea
+                        # Arguments:
+                        # 1 : int : count to increment by
+                        i += 3 # idea may have been done
+                    
+                    case _:
+                        _throw("Unknown instruction", i)
+
+            elif c == "i":
+                pass # io
+            elif instruction in INSTRUCTIONS[c]:
+                pass # imported
+            else:
+                _throw("Unknown key: make sure you installed and imported the set correctly, and that you are using the correct set key", i) 
                         
                     
-            # ((((((((((((((((((((((((((((((((((()))))))))))))))))))))))))))))))))))
+        # ((((((((((((((((((((((((((((((((((((()))))))))))))))))))))))))))))))))))))
