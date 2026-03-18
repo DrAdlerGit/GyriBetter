@@ -129,9 +129,7 @@ def _getArguments(string: str, index: int, expect: list[list[str]]):
         else:
             _throw("Expected ',' or ')' after argument", j)
     
-    return export, j
-
-        
+    return export, j 
 
 def run(code):
     i = 0
@@ -197,7 +195,16 @@ def run(code):
                     # --------------------------------------------------------------
                     case "set":
                         """
-                        wait gah i dont want to code this its 1234 o clcok
+                        Overrides the value of the current cell with
                         """
-                        startPosition = "gah"
+                        startPosition = i
+
+                        i += 3
+                        amount = _getArguments(code, i, [["int"]])
+                        
+                        TAPE.set(TAPE.x, TAPE.y, amount)
+                    
+                    case "inc":
+
+                    
             # ((((((((((((((((((((((((((((((((((()))))))))))))))))))))))))))))))))))
